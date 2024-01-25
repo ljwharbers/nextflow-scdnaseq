@@ -1,9 +1,9 @@
 # Function to plot genomewide copy number profile heatmaps
-plotHeatmap = function(profiles, bins, order, dendrogram = TRUE, rasterize = FALSE, linesize = .5, rownames = FALSE, annotation = NULL) {
+plotHeatmap = function(profiles, bins, order, dendrogram = TRUE, linesize = .5, rownames = FALSE, annotation = NULL) {
   # Check that order is not specified while dendrogram is also requested
   if(!missing(order)) dendrogram = FALSE
   # Load libraries
-  packages = c("data.table", "ggplot2", "cowplot", "tidyverse", "ggdendro", "ggrastr", "patchwork")
+  packages = c("data.table", "ggplot2", "cowplot", "dplyr", "ggdendro", "patchwork")
   sapply(packages, require, character.only = T)
   
   # Make sure they are data.tables
@@ -72,25 +72,15 @@ plotHeatmap = function(profiles, bins, order, dendrogram = TRUE, rasterize = FAL
     dt_melt[, variable := factor(variable, levels = ddata$labels$label)]
     
     # Plot heatmap
-    if(rasterize) {
-      heatmap = ggplot(dt_melt) +
-        ggrastr::rasterize(geom_linerange(aes(ymin = start_cum, ymax = end_cum, x = variable, color = value), linewidth = linesize)) +
-        coord_flip() +
-        scale_color_manual(values = colors, drop = F) +
-        labs(color = "Copy Number") + 
-        scale_y_continuous(expand = c(0, 0), labels = chr_bounds$chr, breaks = chr_bounds$mid_bp) + 
-        geom_hline(data = chr_bounds, aes(yintercept = end_bp), linetype = 1, linewidth = .8) +
-        custom_theme
-    } else {
-      heatmap = ggplot(dt_melt) +
-        geom_linerange(aes(ymin = start_cum, ymax = end_cum, x = variable, color = value), linewidth = linesize) + 
-        coord_flip() +
-        scale_color_manual(values = colors, drop = F) +
-        labs(color = "Copy Number") + 
-        scale_y_continuous(expand = c(0, 0), labels = chr_bounds$chr, breaks = chr_bounds$mid_bp) + 
-        geom_hline(data = chr_bounds, aes(yintercept = end_bp), linetype = 1, linewidth = .8) +
-        custom_theme
-    }
+    heatmap = ggplot(dt_melt) +
+      geom_linerange(aes(ymin = start_cum, ymax = end_cum, x = variable, color = value), linewidth = linesize) + 
+      coord_flip() +
+      scale_color_manual(values = colors, drop = F) +
+      labs(color = "Copy Number") + 
+      scale_y_continuous(expand = c(0, 0), labels = chr_bounds$chr, breaks = chr_bounds$mid_bp) + 
+      geom_hline(data = chr_bounds, aes(yintercept = end_bp), linetype = 1, linewidth = .8) +
+      custom_theme
+    
     
     if(!is.null(annotation)) {
       setnames(annotation, c("sample", "variable", "value"))
@@ -130,25 +120,15 @@ plotHeatmap = function(profiles, bins, order, dendrogram = TRUE, rasterize = FAL
   }
   
   # Plot heatmap
-  if(rasterize) {
-    heatmap = ggplot(dt_melt) +
-      ggrastr::rasterize(geom_linerange(aes(ymin = start_cum, ymax = end_cum, x = variable, color = value), linewidth = linesize)) +
-      coord_flip() +
-      scale_color_manual(values = colors, drop = F) +
-      labs(color = "Copy Number") + 
-      scale_y_continuous(expand = c(0, 0), labels = chr_bounds$chr, breaks = chr_bounds$mid_bp) + 
-      geom_hline(data = chr_bounds, aes(yintercept = end_bp), linetype = 1, linewidth = .8) +
-      custom_theme
-  } else {
-    heatmap = ggplot(dt_melt) +
-      geom_linerange(aes(ymin = start_cum, ymax = end_cum, x = variable, color = value), linewidth = linesize) +    
-      coord_flip() +
-      scale_color_manual(values = colors, drop = F) +
-      labs(color = "Copy Number") + 
-      scale_y_continuous(expand = c(0, 0), labels = chr_bounds$chr, breaks = chr_bounds$mid_bp) + 
-      geom_hline(data = chr_bounds, aes(yintercept = end_bp), linetype = 1, linewidth = .8) +
-      custom_theme
-  }
+  heatmap = ggplot(dt_melt) +
+    geom_linerange(aes(ymin = start_cum, ymax = end_cum, x = variable, color = value), linewidth = linesize) +    
+    coord_flip() +
+    scale_color_manual(values = colors, drop = F) +
+    labs(color = "Copy Number") + 
+    scale_y_continuous(expand = c(0, 0), labels = chr_bounds$chr, breaks = chr_bounds$mid_bp) + 
+    geom_hline(data = chr_bounds, aes(yintercept = end_bp), linetype = 1, linewidth = .8) +
+    custom_theme
+  
   
   return(heatmap)
 }
