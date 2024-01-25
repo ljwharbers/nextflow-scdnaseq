@@ -29,7 +29,7 @@ cd nextflow-scdnaseq
 You can test the pipeline by typing:  
 `nextflow run main.nf -profile test`  
 
-This will run it with default parameters and a test samplesheet and dataset that is included in the repository. If this runs without any issues you can run it in your own dataset.
+This will run the pipeline with default parameters and a test samplesheet and dataset that is included in the repository. If this runs without any issues you can carry on and run it in your own dataset.
 
 ### Running the pipeline with your own dataset
 To run the pipeline with your own dataset, there are a few steps to take.
