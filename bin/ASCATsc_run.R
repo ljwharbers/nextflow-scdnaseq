@@ -58,8 +58,8 @@ prefix = ifelse(grepl("chr", chroms[1]), "chr", "")
 ploidies = seq(argv$min_ploidy, argv$max_ploidy, 0.01)
 purs = seq(argv$min_purity, argv$max_purity, 0.01)
 psi = argv$psi
-multipcf = ifelse(argv$multipcf, "TRUE", "FALSE")
-penalty = argv$penalty
+multipcf = ifelse(argv$multipcf, TRUE, FALSE)
+penalty = ifelse(multipcf, 1 / argv$penalty, argv$penalty)
 threads = argv$threads
 
 # Run ASCAT.sc

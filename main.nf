@@ -4,7 +4,7 @@ params.fasta_index = WorkflowMain.getGenomeAttribute(params, 'fasta_index')
 params.bwaindex = WorkflowMain.getGenomeAttribute(params, 'bwa')
 
 // Get penalty to use
-params.penalty = params.multipcf == "TRUE" ? params.multipcf_penalty : params.segmentation_alpha
+params.penalty = params.multipcf ? params.multipcf_penalty : params.segmentation_alpha
 
 // Print pipeline info
 log.info """\
@@ -19,7 +19,7 @@ log.info """\
 
 // Align fastq files with bwa-mem2
 process ALIGN {
-    label "process_high"
+    label "process_highcpu"
     tag "bwa mem on ${sample}"
     
     container 'https://depot.galaxyproject.org/singularity/mulled-v2-fe8faa35dbf6dc65a0f7f5d4ea12e31a79f73e40:219b6c272b25e7e642ae3ff0bf0c5c81a5135ab4-0'
@@ -165,7 +165,7 @@ process FLAGSTAT {
 
 // Run Fastqc on initial fastq files
 process  FASTQC {
-	label "process_medium"
+	label "process_low"
 	tag "FASTQC on ${sample}"
 
 	container "https://depot.galaxyproject.org/singularity/fastqc:0.11.9--0"
@@ -209,8 +209,8 @@ workflow {
     if (params.paired) {
         Channel
             .fromFilePairs(params.indir + "/*R{1,2}*{fastq,fastq.gz,fq,fq.gz}")
-            .map { file -> tuple( file.baseName.replaceAll("_R.+", ""), file) }
             .set { reads }
+            reads.view()
     } else {
         Channel
             .fromPath(params.indir + "/*{fastq,fastq.gz,fq,fq.gz}")
