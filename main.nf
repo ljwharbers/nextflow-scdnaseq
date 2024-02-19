@@ -210,7 +210,6 @@ workflow {
         Channel
             .fromFilePairs(params.indir + "/*R{1,2}*{fastq,fastq.gz,fq,fq.gz}")
             .set { reads }
-            reads.view()
     } else {
         Channel
             .fromPath(params.indir + "/*{fastq,fastq.gz,fq,fq.gz}")
@@ -225,7 +224,7 @@ workflow {
     // CNA Calling
     chroms = GETCHROMS(params.fasta_index, params.sex)
     ascat_bams = deduped.bam.map { tuple( it[1] ) }
-    ascat_bai = deduped.bai.map { tuple ( it[1] )}
+    ascat_bai = deduped.bai.map { tuple ( it[1] )} 
     
     // Make combinations of binsizes and penalties
     binsize = channel.from(params.binsize)
