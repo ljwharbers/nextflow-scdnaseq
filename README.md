@@ -43,7 +43,7 @@ To run the pipeline with your own dataset, there are a few steps to take.
 Following this you can either change the default parameters in the `nextflow.config` file or supply the parameters related to your own dataset in the command you type. I suggest that you change parameters that won't change much between runs in the `nextflow.config` file, while you specify parameters such as `indir` and `outdir` through the command line.
 
 An example command to run this on your own data could be:  
-`nextflow run main.nf --indir path/to/fastq/dir --outdir path/to/results --fasta path/to/reference.fa --bwaindex /path/to/bwa/index/folder`
+`nextflow run main.nf --indir path/to/fastq/dir --outdir path/to/results --fasta path/to/reference.fa --fasta_index path/to/reference.fa.fai --bwaindex /path/to/bwa/index/folder`
 
 If you do not specify a fasta file and bowtie2 index, you can specify the reference genome you want to use and it will download it from an AWS s3 bucket. For example in the following way:  
 `nextflow run main.nf --indir path/to/fastq/dir --outdir path/to/results --genome GRCh38`
