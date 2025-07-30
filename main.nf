@@ -28,18 +28,18 @@ process ALIGN {
         tuple val(sample), path(reads)
         path(index)
         val(platform)
+        val(resolveome)
 
     output:
         tuple val(sample), path("${sample}.bam"), emit: bam
         
     script:
+        def resolveome_arg = resolveome ? "-M -Y -K 2500000000" : ""
         """
         INDEX=`find -L ./ -name "*.amb" | sed 's/\\.amb\$//'`
 
         bwa mem \\
-            -M \\
-            -Y \\
-            -K 2500000000 \\
+            ${resolveome_arg} \\
             -R "@RG\\tID:${sample}\\tSM:${sample}\\tPL:${platform}" \\
             -t $task.cpus \\
             \$INDEX \\
@@ -223,7 +223,7 @@ workflow {
     }
 
     // PREPROCESS
-    aligned = ALIGN(reads, params.bwaindex, params.platform) // BWA-MEM2
+    aligned = ALIGN(reads, params.bwaindex, params.platform, params.resolveome) // BWA-MEM2
     deduped = MARKDUPLICATES(aligned) // GATK MARKDUPLICATES
     
     // CNA Calling
