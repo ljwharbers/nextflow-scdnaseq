@@ -383,14 +383,14 @@ bins = pblapply(names(res$lSe), function(chr) {
   data.table(chr = chr, 
              start = res$lSe[[chr]]$start,
              end = res$lSe[[chr]]$end)
-}, cl = 38)
+}, cl = threads)
 bins = rbindlist(bins)
 
 # Get profiles
 profiles = pblapply(res$allProfiles, function(cell) {
   dt = as.data.table(cell)
   rep(dt$total_copy_number, as.numeric(dt$num.mark)) |> as.numeric()
-}, cl = 38)
+}, cl = threads)
 profiles = do.call(cbind, profiles) |> data.table()
 
 # Get raw segments
@@ -399,7 +399,7 @@ raw = pblapply(colnames(profiles), function(cell) {
   # return(dt$smoothed * res$allSolutions[[dt$file[1]]]$ploidy)
   return(res$allSolutions[[dt$file[1]]]$ploidy * 2 ^ (dt$smoothed))
   
-})
+}, cl = threads)
 raw = do.call(cbind, raw) |> data.table()
 setnames(raw, colnames(profiles))
 
@@ -409,7 +409,7 @@ saveRDS(list(bins, profiles, raw), paste0(workdir, "/ASCAT.sc_profiles.rds"))
 # Plot profiles
 invisible(pblapply(colnames(profiles), function(cell) {
   plotProfile(profiles[[cell]], raw[[cell]], bins) |> save_and_plot(paste0(workdir, "/plots/profiles/", cell), height = 6, width = 14, output = "png")
-}, cl = 38))
+}, cl = threads))
 
 # Plot Heatmap
 invisible(plotHeatmap(profiles, bins, linesize = 1.75) |> save_and_plot(paste0(workdir, "/plots/genomewideheatmap"), height = 4, width = 20, output = "png"))
